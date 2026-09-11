@@ -1,0 +1,30 @@
+name: Apply TravelApp V9 tweaks
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  tweak:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply requested UI tweaks
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text()
+          s = s.replace('    <a href="#prep">准备</a>\n    <a href="#memories"', '    <a href="#prep">准备</a>\n    <a href="#expenses">记账</a>\n    <a href="#memories"')
+          s = s.replace('<div class="drawer-title">旅行资料</div>', '<div class="drawer-title">旅行日记</div>')
+          s = s.replace('<option value="GBP">GBP 英镑</option></select>', '<option value="GBP">GBP 英镑</option><option value="TRY">TRY 里拉</option></select>')
+          s = s.replace('const fxToRmb={CNY:1,AUD:4.8,USD:7.2,SGD:5.4,EUR:8.4,JPY:0.046,GBP:9.7};', 'const fxToRmb={CNY:1,AUD:4.8,USD:7.2,SGD:5.4,EUR:8.4,JPY:0.046,GBP:9.7,TRY:0.22};')
+          s = s.replace("const currencyLabels={CNY:'CNY 人民币',AUD:'AUD 澳元',USD:'USD 美元',SGD:'SGD 新元',EUR:'EUR 欧元',JPY:'JPY 日元',GBP:'GBP 英镑'};", "const currencyLabels={CNY:'CNY 人民币',AUD:'AUD 澳元',USD:'USD 美元',SGD:'SGD 新元',EUR:'EUR 欧元',JPY:'JPY 日元',GBP:'GBP 英镑',TRY:'TRY 里拉'};")
+          p.write_text(s)
+          PY
+          if git diff --quiet -- index.html; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'fix: add ledger tab, lira currency, and rename diary drawer'
+          git push
