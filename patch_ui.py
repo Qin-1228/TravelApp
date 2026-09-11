@@ -34,7 +34,8 @@ new = '''function bindSwipe(row){
   row.addEventListener('touchmove',e=>{const t=e.touches[0],dx=t.clientX-startX,dy=t.clientY-startY;if(!locked&&(Math.abs(dx)>8||Math.abs(dy)>8))locked=Math.abs(dx)>Math.abs(dy);if(locked&&dx<0){current=Math.max(dx,-76);row.style.transform=`translateX(${current}px)`;}},{passive:true});
   row.addEventListener('touchend',()=>{if(locked&&current<-44){row.style.transform='translateX(-76px)';row.classList.add('is-open');}else if(locked){row.style.transform='';row.classList.remove('is-open');}});
 }'''
-s2,n = re.subn(r'function bindSwipe\(row\)\{.*?\n\}\ndocument\.querySelectorAll\(\'.checkgroup\'', new + "\ndocument.querySelectorAll('.checkgroup'", s, count=1, flags=re.S)
+pattern = r'function bindSwipe\(row\)\{.*?\}document\.querySelectorAll\(\'.checkgroup\''
+s2,n = re.subn(pattern, new + "document.querySelectorAll('.checkgroup'", s, count=1, flags=re.S)
 if n != 1:
     raise SystemExit('bindSwipe not found')
 s = s2
