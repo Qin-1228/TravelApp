@@ -1,6 +1,7 @@
 name: Mobile shell fix
 on:
-  workflow_dispatch:
+  push:
+    branches: [main]
 jobs:
   patch:
     runs-on: ubuntu-latest
