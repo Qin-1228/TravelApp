@@ -197,7 +197,7 @@ body{width:100%;max-width:100%;overflow-x:hidden;overscroll-behavior-x:none;}
 </main>
 <script>
 const tripStart = new Date('2025-09-29T00:00:00'); const tripEnd = new Date('2025-10-09T23:59:59'); const nearDays = 7; const now = new Date();
-const statusEl=document.getElementById('status'),memoryTab=document.getElementById('memoryTab'),memorySection=document.getElementById('memories');
+const statusEl=document.getElementById('overview-status'),memoryTab=document.getElementById('memoryTab'),memorySection=document.getElementById('memories');
 function wholeDaysBetween(a,b){return Math.max(0,Math.ceil(Math.abs(a-b)/86400000));}
 if(now<tripStart){const diff=wholeDaysBetween(now,tripStart);statusEl.textContent=(diff<=nearDays?'准备出发·':'待出发·')+diff+'天';}else if(now<=tripEnd){statusEl.textContent='旅行中';}else{statusEl.textContent='旅行归来·'+wholeDaysBetween(tripEnd,now)+'天';memoryTab.classList.remove('hidden');memorySection.classList.remove('hidden');}
 
@@ -283,7 +283,7 @@ const header=document.querySelector('.header'),topSentinel=document.createElemen
 })();
 
 
-(function(){const old=document.getElementById('status');const neo=document.getElementById('overview-status');if(old&&neo){const sync=()=>{neo.textContent=old.textContent};sync();new MutationObserver(sync).observe(old,{childList:true,characterData:true,subtree:true,attributes:true)}}})();
+
 </script>
 </body>
 </html>
