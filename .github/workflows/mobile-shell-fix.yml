@@ -1,0 +1,36 @@
+name: Mobile shell fix
+on:
+  workflow_dispatch:
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch mobile viewport and shell
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text()
+          s = s.replace('width=device-width,initial-scale=1,viewport-fit=cover', 'width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover')
+          css = r'''
+          /* Mobile product shell */
+          html{width:100%;max-width:100%;overflow-x:hidden;-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+          body{width:100%;max-width:100%;overflow-x:hidden;overscroll-behavior-x:none;}
+          .page{width:100%;max-width:500px;margin:0 auto;overflow-x:clip;}
+          .head{padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right));}
+          @media(max-width:799px){body{background:#fff}.page{min-height:100dvh}.section{width:100%}button,a,input,select{touch-action:manipulation}}
+          @media(min-width:800px){.page{max-width:900px}}
+          '''
+          s = s.replace('</style>', css + '\n</style>', 1)
+          p.write_text(s)
+          PY
+      - name: Commit patch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Refine mobile web app shell and prevent zoom' || exit 0
+          git push
