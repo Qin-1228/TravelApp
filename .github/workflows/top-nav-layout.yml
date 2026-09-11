@@ -1,8 +1,6 @@
 name: Top nav layout
 on:
   push:
-    paths:
-      - index.html
   workflow_dispatch:
 jobs:
   patch:
@@ -25,15 +23,12 @@ jobs:
           s=s[:start]+new+s[end+9:]
           css='''\n/* TOP NAV LAYOUT V1 */\n.header{background:#fff;border-bottom:1px solid #222;}\n.head{height:52px;padding:0 12px;display:flex;align-items:center;gap:10px;}\n.menu{flex:0 0 auto;height:32px;min-width:44px;padding:0 8px;border:1px solid #222;background:#fff;font-size:10px;letter-spacing:.08em;}\n.nav{min-width:0;flex:1;display:flex;align-items:stretch;overflow-x:auto;scrollbar-width:none;border:0;}\n.nav::-webkit-scrollbar{display:none}\n.nav a{position:relative;flex:0 0 auto;text-align:center;text-decoration:none;color:#222;padding:0 11px;height:52px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;border:0;white-space:nowrap;}\n.nav a::after{content:"";position:absolute;left:10px;right:10px;bottom:7px;height:2px;background:#111;transform:scaleX(0);transition:transform .18s ease;}\n.nav a.nav-current::after{transform:scaleX(1)}\n.nav a:first-child{padding-left:7px}\n.overview-status{display:flex;align-items:center;gap:10px;margin:0 0 16px;}\n.overview-status .status{display:inline-flex;align-items:center;border:1px solid #222;border-radius:999px;padding:7px 10px;font-size:11px;background:#f3f3f1;white-space:nowrap;}\n.overview-status .status-copy{font-size:9px;color:#929899;letter-spacing:.12em;}\n@media(max-width:700px){.head{height:52px;padding:0 12px}.nav a{height:52px;font-size:13px;padding:0 11px}.nav a::after{bottom:6px}.overview-status{margin-bottom:18px}.overview-status .status{font-size:12px;padding:7px 10px}.overview-status .status-copy{font-size:9px}}\n@media(min-width:701px){.head{height:58px;padding:0 18px}.nav a{height:58px;padding:0 18px}.overview-status{margin-bottom:18px}}\n'''
           s=s.replace('</style>',css+'\n</style>',1)
-          # Remove the old header status if it survived outside the replacement.
-          s=s.replace('<div class="title">2025/09/29 🇦🇺澳大利亚墨尔本&悉尼&凯恩斯旅行</div>','')
-          # Insert status into the actual overview section.
           pos=s.find('<section class="section" id="overview">')
           if pos<0: raise SystemExit('overview section not found')
           gt=s.find('>',pos)+1
           block='''\n<div class="overview-status"><span class="status" id="overview-status">旅行状态</span><span class="status-copy">TRIP STATUS</span></div>'''
           s=s[:gt]+block+s[gt:]
-          # Keep existing dynamic status calculation as source of truth by mirroring #status when present.
+          # Existing dynamic status logic is preserved by mirroring the legacy status source when present.
           js='''\n(function(){const old=document.getElementById('status');const neo=document.getElementById('overview-status');if(old&&neo){const sync=()=>{neo.textContent=old.textContent};sync();new MutationObserver(sync).observe(old,{childList:true,characterData:true,subtree:true,attributes:true)}}})();\n'''
           s=s.replace('</script>',js+'</script>',1)
           p.write_text(s)
